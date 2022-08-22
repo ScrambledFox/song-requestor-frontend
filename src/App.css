@@ -36,3 +36,55 @@
     transform: rotate(360deg);
   }
 }
+
+.form-elements {
+  display: grid;
+
+  padding: 10px;
+  margin: 25px;
+}
+
+.centered {
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: block;
+}
+
+.center-text {
+  text-align: center;
+}
+
+.divider-solid {
+  border-top: 1px solid black;
+}
+
+.request-error {
+  color: red
+}
+
+.input {
+ background-color: #ffffff;
+ padding: 10px;
+ margin: 0 5px;
+
+ border-radius: 10px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 10px;
+}
+
+.btn:hover {
+  background-color: #ddd;
+  cursor: pointer;
+}
+
+.link-renderer {
+  cursor: pointer;
+}
+
+.img-thumbnail {
+  height: 100%;
+  object-fit: contain;
+}

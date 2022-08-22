@@ -1,25 +1,53 @@
-import logo from "./logo.svg";
 import "./App.css";
 
-function App() {
+import React, { useState } from "react";
+
+import Modal from "react-modal";
+
+import SongTable from "./components/SongTable";
+import AddSongForm from "./components/AddSongForm";
+
+const modalStyle = {
+  content: {
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)",
+  },
+};
+
+const App = () => {
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+
+  const openModal = () => {
+    setModalIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+      <div className="App-header">
+        <SongTable />
+
+        <button style={{ marginTop: 50 }} className="btn" onClick={openModal}>
+          Request Song
+        </button>
+
+        <Modal
+          isOpen={modalIsOpen}
+          onRequestClose={closeModal}
+          style={modalStyle}
         >
-          Learn React
-        </a>
-      </header>
+          <AddSongForm />
+        </Modal>
+      </div>
     </div>
   );
-}
+};
 
 export default App;

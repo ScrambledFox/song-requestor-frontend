@@ -1,18 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import isEmpty from "validator/lib/isEmpty";
 import isURL from "validator/lib/isURL";
 import trim from "validator/lib/trim";
 
+import axios from "axios";
+
 import "../App.css";
 
 const AddSongForm = () => {
   const [error, setError] = useState("");
-
   const [usingLink, setUsingLink] = useState(false);
+
+  const [IP, setIP] = useState("unknown");
 
   const onLinkChanged = (e) => {
     setUsingLink(!isEmpty(e.target.value));
+  };
+
+  // Get user IP.
+  useEffect(() => {
+    LoadOrigin();
+  }, []);
+
+  const LoadOrigin = async () => {
+    const res = await axios.get("https://geolocation-db.com/json/");
+    setIP(res.data.IPv4);
   };
 
   const onSubmit = (e) => {
@@ -35,7 +48,7 @@ const AddSongForm = () => {
         return;
       }
 
-      fetch("http://localhost:5000/songs", {
+      fetch(process.env.REACT_APP_BACKEND_URL, {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -43,10 +56,19 @@ const AddSongForm = () => {
         },
         body: JSON.stringify({
           youtube_link: link,
+          origin: IP,
         }),
-      }).then(() => {
-        e.target.submit();
-      });
+      })
+        .then((res) => {
+          if (res.status == 200) e.target.submit();
+          if (res.status == 409) setError("This video has already been added!");
+
+          return;
+        })
+        .catch((res) => {
+          console.error(res.statusMessage);
+          return;
+        });
     } else {
       if (isEmpty(title)) {
         setError("Please enter a song title.");
@@ -58,7 +80,7 @@ const AddSongForm = () => {
         return;
       }
 
-      fetch("http://localhost:5000/songs", {
+      fetch(process.env.REACT_APP_BACKEND_URL, {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -67,68 +89,71 @@ const AddSongForm = () => {
         body: JSON.stringify({
           title: title,
           artist: artist,
+          origin: IP,
         }),
-      }).then(() => {
-        e.target.submit();
-      });
+      })
+        .then((res) => {
+          if (res.status == 200) e.target.submit();
+          if (res.status == 409) setError("This video has already been added!");
+
+          return;
+        })
+        .catch((res) => {
+          console.error(res.statusMessage);
+          return;
+        });
     }
   };
 
   return (
-    <div>
-      <div>
-        <form onSubmit={onSubmit}>
-          <div className="form-elements">
-            <div className="centered" style={{ marginBottom: 20 }}>
+    <div className="modal-content">
+      <form onSubmit={onSubmit}>
+        <div className="form-elements">
+          <div>
+            <p>
               <i>
                 Enter the song title and artist -- or -- enter a youtube link.
               </i>
-            </div>
-
-            <div className="centered">
-              <input
-                className="input"
-                type="text"
-                name="title"
-                placeholder="Song Title"
-                disabled={usingLink}
-              />
-              by
-              <input
-                className="input"
-                type="text"
-                name="artist"
-                placeholder="Artist Name"
-                disabled={usingLink}
-              />
-            </div>
-
-            <div style={{ marginTop: 20, marginBottom: 20 }}>
-              <p className="center-text">or</p>
-              <hr className="divider-solid" />
-            </div>
-
-            <div style={{ marginBottom: 20 }}>
-              <input
-                className="input centered"
-                style={{ width: 400 }}
-                type="text"
-                name="youtube_link"
-                placeholder="YouTube Link"
-                onChange={onLinkChanged}
-              />
-            </div>
-
-            <div>
-              {error !== "" && <p className="request-error">{error}</p>}
-            </div>
-
-            <div>
-              <button className="btn centered">Request</button>
-            </div>
+            </p>
           </div>
-        </form>
-      </div>
+
+          <div>
+            <input
+              className="input"
+              type="text"
+              name="title"
+              placeholder="Song Title"
+              disabled={usingLink}
+            />
+
+            <span style={{ display: "inline-block", margin: 10 }}>by</span>
+
+            <input
+              className="input"
+              type="text"
+              name="artist"
+              placeholder="Artist Name"
+              disabled={usingLink}
+            />
+          </div>
+          {usingLink && (
+            <i>
+              Remove link to be able to enter a song name and artist instead.
+            </i>
+          )}
+          <p className="center-text">or</p>
+          <hr className="divider-solid" />
+          <input
+            className="input centered"
+            type="text"
+            name="youtube_link"
+            placeholder="YouTube Link"
+            onChange={onLinkChanged}
+          />
+          {error !== "" && <p className="request-error">{error}</p>}
+          <button className="btn centered">Request</button>
+        </div>
+      </form>
     </div>
   );
 };

@@ -45,9 +45,9 @@ const SongTable = () => {
     console.log("cellClicked", event);
   }, []);
 
-  // Load test data from server
+  // Load data from server
   useEffect(() => {
-    fetch("http://localhost:5000/songs")
+    fetch(process.env.REACT_APP_BACKEND_URL)
       .then((result) => result.json())
       .then((rowData) => setRowData(rowData));
   }, []);

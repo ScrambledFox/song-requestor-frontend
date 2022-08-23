@@ -1,22 +1,12 @@
-import "./App.css";
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useDocumentTitle } from "./hooks/useDocumentTitle";
 
 import Modal from "react-modal";
 
+import "./App.css";
+
 import SongTable from "./components/SongTable";
 import AddSongForm from "./components/AddSongForm";
-
-const modalStyle = {
-  content: {
-    top: "50%",
-    left: "50%",
-    right: "auto",
-    bottom: "auto",
-    marginRight: "-50%",
-    transform: "translate(-50%, -50%)",
-  },
-};
 
 const App = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -29,19 +19,27 @@ const App = () => {
     setModalIsOpen(false);
   };
 
+  useDocumentTitle("List");
+
   return (
     <div className="App">
       <div className="App-header">
-        <SongTable />
-
-        <button style={{ marginTop: 50 }} className="btn" onClick={openModal}>
+        <button
+          style={{ marginBottom: 50 }}
+          className="btn"
+          onClick={openModal}
+        >
           Request Song
         </button>
+
+        <SongTable />
 
         <Modal
           isOpen={modalIsOpen}
           onRequestClose={closeModal}
-          style={modalStyle}
+          className="modal"
+          overlayClassName="modal-overlay"
+          ariaHideApp={false}
         >
           <AddSongForm />
         </Modal>
